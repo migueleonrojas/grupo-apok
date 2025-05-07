@@ -1,0 +1,62 @@
+<section class="card-item-container">
+  @defer (when (nodes$ | async)) { @for (node of (nodes$ | async); track $index)
+  {
+
+  <mat-card class="card-item" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>
+        <div>
+          <span><b>Id:</b></span> {{ node.id }}
+        </div>
+        <div>
+          <span><b>Título:</b></span> {{ node.title }}
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-footer class="card-item-options">
+      <mat-chip-set aria-label="options">
+        <mat-chip>Crear Nodo</mat-chip>
+        <mat-chip color="primary" (click)="deleteNode()"
+          >Eliminar Nodo</mat-chip
+        >
+        <mat-chip>Ver Nodo Padre</mat-chip>
+        <mat-chip>Ver Nodo Hijo</mat-chip>
+      </mat-chip-set>
+    </mat-card-footer>
+  </mat-card>
+
+  } } @placeholder {
+  <h2 class="text">Cargando</h2>
+  } @error {
+  <h2>Hubo un error al obtener los nodos</h2>
+  }
+</section>
+
+<!-- @for (node of (nodes$ | async); track $index) {
+
+<mat-card class="card-node" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>
+      <div>
+        <span><b>Id:</b></span> {{ node.id }}
+      </div>
+      <div>
+        <span><b>Título:</b></span> {{ node.title }}
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>{{ "1111" }}</p>
+  </mat-card-content>
+  <mat-card-footer class="card-node-options">
+    <mat-chip-set aria-label="options">
+      <mat-chip>Crear Nodo</mat-chip>
+      <mat-chip color="primary" (click)="deleteNode()">Eliminar Nodo</mat-chip>
+      <mat-chip>Ver Nodo Padre</mat-chip>
+      <mat-chip>Ver Nodo Hijo</mat-chip>
+    </mat-chip-set>
+  </mat-card-footer>
+</mat-card>
+} @empty {
+<h1>No hay datos</h1>
+} -->
