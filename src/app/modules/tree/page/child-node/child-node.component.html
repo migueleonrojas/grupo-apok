@@ -1,6 +1,22 @@
 <section class="card-item-container">
-  @defer (when (nodes$ | async)) { @for (node of (nodes$ | async); track $index)
-  {
+  @if ((nodes$ | async) == undefined) {
+  <mat-card class="card-item" appearance="outlined">
+    <mat-card-content>
+      <span class="text-center">NO HAY MÁS NODOS HIJOS</span>
+    </mat-card-content>
+    <mat-card-footer class="card-item-options">
+      <button
+        mat-fab
+        aria-label="go back"
+        matTooltip="Regresar"
+        (click)="goBack()"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </mat-card-footer>
+  </mat-card>
+  } @else { @defer (when (nodes$ | async)) { @for (node of (nodes$ | async);
+  track $index) {
 
   <mat-card class="card-item" appearance="outlined">
     <mat-card-header>
@@ -19,8 +35,10 @@
         <mat-chip color="primary" (click)="deleteNode()"
           >Eliminar Nodo</mat-chip
         >
-        <mat-chip>Ver Nodo Padre</mat-chip>
-        <mat-chip>Ver Nodo Hijo</mat-chip>
+        <mat-chip (click)="goToParentNode(node.parent!)"
+          >Ver Nodo Padre</mat-chip
+        >
+        <mat-chip (click)="goToChildNode(node.id)">Ir al Nodo Hijo</mat-chip>
       </mat-chip-set>
     </mat-card-footer>
   </mat-card>
@@ -29,7 +47,7 @@
   <h2 class="text">Cargando</h2>
   } @error {
   <h2>Hubo un error al obtener los nodos</h2>
-  }
+  } }
 </section>
 
 <!-- @for (node of (nodes$ | async); track $index) {
