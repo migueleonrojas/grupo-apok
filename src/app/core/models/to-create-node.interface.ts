@@ -1,4 +1,4 @@
 export interface ToCreateNode {
-  parent: string;
+  parent: number;
   locales: string[];
 }

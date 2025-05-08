@@ -1,10 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, of, startWith } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ToCreateNode } from '../../../core/models/to-create-node.interface';
 import { NodeTree } from '../../../core/models/node.interface';
 import { GetNode } from '../../../core/models/get-node.interface';
+import { CreateNode } from '../../../core/models/create-node.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -18,8 +19,20 @@ export class NodesService {
     );
   }
 
-  createNode(toCreateNode: ToCreateNode): Observable<any> {
-    return this.httpClient.post(`${environment.url}`, toCreateNode);
+  createNode(toCreateNode: ToCreateNode): Observable<NodeTree> {
+    return this.httpClient
+      .post<CreateNode>(`${environment.url}/node`, toCreateNode, {
+        headers: new HttpHeaders({
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        }),
+      })
+      .pipe(
+        map((value) => {
+          const { translation, ...nodeTree } = value;
+          return nodeTree;
+        })
+      );
   }
 
   getNode(idNode: number, locale: String): Observable<GetNode> {

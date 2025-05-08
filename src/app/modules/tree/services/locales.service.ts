@@ -10,19 +10,6 @@ import { Locale } from '../../../core/models/locales.interface';
 export class LocalesService {
   private httpClient = inject(HttpClient);
 
-  /* private currentLocale = signal<Locale>({
-    label: 'Español',
-    locale: 'es_ES',
-  });
-
-  getCurrentLocale(): Signal<Locale> {
-    return this.currentLocale.asReadonly();
-  }
-
-  setCurrentLocale(locale: Locale) {
-    this.currentLocale.set(locale);
-  } */
-
   getLocales(): Observable<Locale[]> {
     return this.httpClient.get<Locale[]>(`${environment.url}/locales`);
   }

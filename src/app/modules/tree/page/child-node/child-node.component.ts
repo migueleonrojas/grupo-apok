@@ -5,14 +5,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Sweetalert2Service } from '../../../../shared/service/sweetalert2/sweetalert2.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NodesService } from '../../services/nodes.service';
 import { firstValueFrom, lastValueFrom, Observable, of } from 'rxjs';
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { NodeTree } from '../../../../core/models/node.interface';
 import { Location } from '@angular/common';
 import { LocalesService } from '../../services/locales.service';
@@ -29,7 +29,6 @@ import {
     MatCardModule,
     MatChipsModule,
     AsyncPipe,
-    JsonPipe,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
@@ -37,6 +36,7 @@ import {
     MatInputModule,
     MatSelectModule,
     MatFormFieldModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './child-node.component.html',
   styleUrl: './child-node.component.scss',
@@ -60,9 +60,9 @@ export class ChildNodeComponent implements OnInit {
 
   locales$: Observable<Locale[]> = new Observable<Locale[]>();
 
-  /* currentLocale = this.localesService.getCurrentLocale(); */
-
   parentId: number = 0;
+
+  locales = new FormControl<Locale[]>([]);
 
   async ngOnInit() {
     this.locales$ = this.localesService.getLocales();
@@ -111,6 +111,28 @@ export class ChildNodeComponent implements OnInit {
     });
 
     this.nodes$ = of(updatedNodes);
+  }
+
+  async createNode() {
+    if (this.locales.value?.length! < 1) {
+      this.sweetalert2Service.showMessage(
+        'Ocurrio algo',
+        'Debe seleccionar al menos un lenguaje'
+      );
+      return;
+    }
+
+    const selectedLocales = this.locales.value!.map((locale) => locale.locale);
+
+    const nodeCreated = await firstValueFrom(
+      this.nodesService.createNode({
+        locales: selectedLocales,
+        parent: this.parentId,
+      })
+    );
+    const nodeTree = await lastValueFrom(this.nodes$);
+
+    this.nodes$ = of([...nodeTree!]);
   }
 
   async deleteNode(id: number) {
