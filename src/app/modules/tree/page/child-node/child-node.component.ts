@@ -146,16 +146,17 @@ export class ChildNodeComponent implements OnInit {
     }
     let nodeDeleted = await firstValueFrom(this.nodesService.deleteNode(id));
 
+    const nodeTree = await lastValueFrom(this.nodes$);
+
     if (childsCurrentNode === undefined) {
-      this.nodes$ = of(undefined);
+      this.ngOnInit();
+
       return;
     }
 
-    const nodeTree = await lastValueFrom(this.nodes$);
-
     const nodesAfterDeleted = removeByProperty(nodeTree!, 'id', nodeDeleted.id);
 
-    this.nodes$ = of(nodesAfterDeleted);
+    this.ngOnInit();
   }
 
   goBack() {
