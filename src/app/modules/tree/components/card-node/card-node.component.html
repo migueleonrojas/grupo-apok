@@ -1,0 +1,35 @@
+<mat-card class="card-item" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>
+      <div>
+        <span><b>Id:</b></span> {{ nodeInput().id }}
+      </div>
+      <div>
+        <span><b>Título:</b></span> {{ nodeInput().title }}
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <h4>Selecciona un lenguaje</h4>
+    <mat-form-field>
+      <mat-label>Lenguajes</mat-label>
+      <mat-select (selectionChange)="changeLocale($event, nodeInput())">
+        @for (locale of localesInput(); track $index) {
+        <mat-option [value]="locale">{{ locale.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </mat-card-content>
+
+  <mat-card-footer class="card-item-options">
+    <mat-chip-set aria-label="options">
+      <mat-chip color="primary" (click)="emitCurrentId(nodeInput().id)"
+        >Eliminar Nodo</mat-chip
+      >
+      <mat-chip (click)="emitParentId(nodeInput().parent!)"
+        >Ver Nodo Padre</mat-chip
+      >
+      <mat-chip (click)="emitChildId(nodeInput().id)">Ir al Nodo Hijo</mat-chip>
+    </mat-chip-set>
+  </mat-card-footer>
+</mat-card>
