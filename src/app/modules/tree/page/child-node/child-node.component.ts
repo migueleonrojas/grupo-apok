@@ -132,6 +132,11 @@ export class ChildNodeComponent implements OnInit {
     );
     const nodeTree = await lastValueFrom(this.nodes$);
 
+    this.sweetalert2Service.showMessage(
+      'Nodo creado',
+      `Se acaba de crear el node con el id:${nodeCreated.id}`
+    );
+
     this.nodes$ = of([...nodeTree!]);
   }
 
