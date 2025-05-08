@@ -15,8 +15,21 @@
       </button>
     </mat-card-footer>
   </mat-card>
-  } @else { @defer (when (nodes$ | async)) { @for (node of (nodes$ | async);
-  track $index) {
+  } @else { @defer (when (nodes$ | async)) {
+
+  <!-- <aside class="locales">
+    <h4>Selecciona un lenguaje</h4>
+    <mat-form-field>
+      <mat-label>Lenguajes</mat-label>
+      <mat-select (selectionChange)="changeLocale($event)">
+        @for (locale of (locales$ | async); track $index) {
+        <mat-option [value]="locale">{{ locale.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </aside> -->
+
+  @for (node of (nodes$ | async); track $index) {
 
   <mat-card class="card-item" appearance="outlined">
     <mat-card-header>
@@ -29,10 +42,21 @@
         </div>
       </mat-card-title>
     </mat-card-header>
+    <mat-card-content>
+      <h4>Selecciona un lenguaje</h4>
+      <mat-form-field>
+        <mat-label>Lenguajes</mat-label>
+        <mat-select (selectionChange)="changeLocale($event, node)">
+          @for (locale of (locales$ | async); track $index) {
+          <mat-option [value]="locale">{{ locale.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </mat-card-content>
     <mat-card-footer class="card-item-options">
       <mat-chip-set aria-label="options">
         <mat-chip>Crear Nodo</mat-chip>
-        <mat-chip color="primary" (click)="deleteNode()"
+        <mat-chip color="primary" (click)="deleteNode(node.id)"
           >Eliminar Nodo</mat-chip
         >
         <mat-chip (click)="goToParentNode(node.parent!)"
@@ -49,32 +73,3 @@
   <h2>Hubo un error al obtener los nodos</h2>
   } }
 </section>
-
-<!-- @for (node of (nodes$ | async); track $index) {
-
-<mat-card class="card-node" appearance="outlined">
-  <mat-card-header>
-    <mat-card-title>
-      <div>
-        <span><b>Id:</b></span> {{ node.id }}
-      </div>
-      <div>
-        <span><b>Título:</b></span> {{ node.title }}
-      </div>
-    </mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <p>{{ "1111" }}</p>
-  </mat-card-content>
-  <mat-card-footer class="card-node-options">
-    <mat-chip-set aria-label="options">
-      <mat-chip>Crear Nodo</mat-chip>
-      <mat-chip color="primary" (click)="deleteNode()">Eliminar Nodo</mat-chip>
-      <mat-chip>Ver Nodo Padre</mat-chip>
-      <mat-chip>Ver Nodo Hijo</mat-chip>
-    </mat-chip-set>
-  </mat-card-footer>
-</mat-card>
-} @empty {
-<h1>No hay datos</h1>
-} -->

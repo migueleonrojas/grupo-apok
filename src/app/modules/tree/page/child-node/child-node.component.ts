@@ -1,16 +1,27 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, linkedSignal, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Sweetalert2Service } from '../../../../shared/service/sweetalert2/sweetalert2.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NodesService } from '../../services/nodes.service';
-import { firstValueFrom, Observable } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import { firstValueFrom, lastValueFrom, Observable, of } from 'rxjs';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 import { NodeTree } from '../../../../core/models/node.interface';
 import { Location } from '@angular/common';
+import { LocalesService } from '../../services/locales.service';
+import { Locale } from '../../../../core/models/locales.interface';
+import { GetNode } from '../../../../core/models/get-node.interface';
+import {
+  removeByProperty,
+  updateByProperty,
+} from '../../../../shared/utils/arrays';
 
 @Component({
   selector: 'app-child-node',
@@ -18,9 +29,14 @@ import { Location } from '@angular/common';
     MatCardModule,
     MatChipsModule,
     AsyncPipe,
+    JsonPipe,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
+    FormsModule,
+    MatInputModule,
+    MatSelectModule,
+    MatFormFieldModule,
   ],
   templateUrl: './child-node.component.html',
   styleUrl: './child-node.component.scss',
@@ -36,13 +52,21 @@ export class ChildNodeComponent implements OnInit {
 
   nodesService: NodesService = inject(NodesService);
 
+  localesService: LocalesService = inject(LocalesService);
+
   nodes$: Observable<NodeTree[] | undefined> = new Observable<
     NodeTree[] | undefined
   >();
 
+  locales$: Observable<Locale[]> = new Observable<Locale[]>();
+
+  /* currentLocale = this.localesService.getCurrentLocale(); */
+
   parentId: number = 0;
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.locales$ = this.localesService.getLocales();
+
     this.route.paramMap.subscribe((params) => {
       this.parentId = Number(params.get('id'));
       this.nodes$ = this.nodesService.getChildNodes(this.parentId);
@@ -63,17 +87,58 @@ export class ChildNodeComponent implements OnInit {
     }
   }
 
-  async getCurrentNode(id: number, locale: string): Promise<NodeTree> {
+  async getCurrentNode(id: number, locale: string): Promise<GetNode> {
     return await firstValueFrom(this.nodesService.getNode(id, locale));
   }
 
-  async deleteNode() {
+  async changeLocale(event: MatSelectChange<Locale>, node: NodeTree) {
+    const nodeTree = await lastValueFrom(this.nodes$);
+
+    let getNodeTranslate = await firstValueFrom(
+      this.nodesService.getNode(node.id, event.value.locale)
+    );
+
+    if (getNodeTranslate.translation.length === 0) {
+      this.sweetalert2Service.showMessage(
+        'Hubo un inconveniente',
+        'El idioma es el mismo o no existe.'
+      );
+      return;
+    }
+
+    const updatedNodes = updateByProperty(nodeTree!, 'id', node.id, {
+      title: getNodeTranslate.translation[0].title,
+    });
+
+    this.nodes$ = of(updatedNodes);
+  }
+
+  async deleteNode(id: number) {
     if (
       !(await this.sweetalert2Service.confirmAction(
         '¿Desea eliminar este nodo?'
       ))
     )
       return;
+
+    let childsCurrentNode = await lastValueFrom(
+      this.nodesService.getChildNodes(id)
+    );
+
+    if (childsCurrentNode !== undefined) {
+      this.sweetalert2Service.showMessage(
+        'Hubo un inconveniente',
+        'No se puede eliminar el node porque tiene nodos hijos.'
+      );
+      return;
+    }
+    let nodeDeleted = await firstValueFrom(this.nodesService.deleteNode(id));
+
+    const nodeTree = await lastValueFrom(this.nodes$);
+
+    const nodesAfterDeleted = removeByProperty(nodeTree!, 'id', nodeDeleted.id);
+
+    this.nodes$ = of(nodesAfterDeleted);
   }
 
   goBack() {

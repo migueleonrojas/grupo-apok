@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, startWith } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ToCreateNode } from '../../../core/models/to-create-node.interface';
 import { NodeTree } from '../../../core/models/node.interface';
@@ -12,8 +12,10 @@ import { GetNode } from '../../../core/models/get-node.interface';
 export class NodesService {
   private httpClient = inject(HttpClient);
 
-  deleteNode(idNode: number): Observable<any> {
-    return this.httpClient.delete(`${environment.url}/node/${idNode}`);
+  deleteNode(idNode: number): Observable<NodeTree> {
+    return this.httpClient.delete<NodeTree>(
+      `${environment.url}/node/${idNode}`
+    );
   }
 
   createNode(toCreateNode: ToCreateNode): Observable<any> {
@@ -36,6 +38,7 @@ export class NodesService {
         `${environment.url}/nodes?parent=${idParent}`
       )
       .pipe(
+        startWith([]),
         map((res) => res ?? []),
         catchError(() => of(undefined))
       );

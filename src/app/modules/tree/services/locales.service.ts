@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Signal, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
+import { Observable } from 'rxjs';
+import { Locale } from '../../../core/models/locales.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -8,7 +10,20 @@ import { environment } from '../../../../environments/environment';
 export class LocalesService {
   private httpClient = inject(HttpClient);
 
-  getLocales() {
-    return this.httpClient.get<any[]>(`${environment.url}/locales`);
+  /* private currentLocale = signal<Locale>({
+    label: 'Español',
+    locale: 'es_ES',
+  });
+
+  getCurrentLocale(): Signal<Locale> {
+    return this.currentLocale.asReadonly();
+  }
+
+  setCurrentLocale(locale: Locale) {
+    this.currentLocale.set(locale);
+  } */
+
+  getLocales(): Observable<Locale[]> {
+    return this.httpClient.get<Locale[]>(`${environment.url}/locales`);
   }
 }

@@ -20,4 +20,12 @@ export class Sweetalert2Service {
       ).isConfirmed ?? false
     );
   }
+
+  async showMessage(title: string, message: string) {
+    this.swal.fire({
+      title,
+      text: message,
+      timer: 3000,
+    });
+  }
 }

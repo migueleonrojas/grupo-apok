@@ -28,3 +28,11 @@
   text-align: center;
   display: block;
 }
+
+.locales {
+  flex-basis: 90vw;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
