@@ -1,26 +1,10 @@
 <section class="card-item-container">
   @defer (when (parentNodes$ | async)) { @for (parentNode of (parentNodes$ |
   async); track $index) {
-
-  <mat-card class="card-item" appearance="outlined">
-    <mat-card-header>
-      <mat-card-title>
-        <div>
-          <span><b>Id:</b></span> {{ parentNode.id }}
-        </div>
-        <div>
-          <span><b>Título:</b></span> {{ parentNode.title }}
-        </div>
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-chip-set aria-label="options">
-        <mat-chip (click)="goToChildNode(parentNode.id)"
-          >Ir al Nodo hijo</mat-chip
-        >
-      </mat-chip-set>
-    </mat-card-content>
-  </mat-card>
+  <app-card-node-parent
+    [parentNode]="parentNode"
+    (parentId)="goToChildNode($event)"
+  ></app-card-node-parent>
 
   } } @placeholder {
   <h2 class="text">Cargando</h2>

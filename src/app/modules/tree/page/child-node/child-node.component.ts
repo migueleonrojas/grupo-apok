@@ -1,14 +1,5 @@
-import { Component, inject, linkedSignal, OnInit } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, inject, OnInit } from '@angular/core';
 import { Sweetalert2Service } from '../../../../shared/service/sweetalert2/sweetalert2.service';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NodesService } from '../../services/nodes.service';
 import { firstValueFrom, lastValueFrom, Observable, of } from 'rxjs';
@@ -22,21 +13,17 @@ import {
   removeByProperty,
   updateByProperty,
 } from '../../../../shared/utils/arrays';
+import { CardNodeEmptyComponent } from '../../components/card-node-empty/card-node-empty.component';
+import { CardNodeCreateComponent } from '../../components/card-node-create/card-node-create.component';
+import { CardNodeComponent } from '../../components/card-node/card-node.component';
 
 @Component({
   selector: 'app-child-node',
   imports: [
-    MatCardModule,
-    MatChipsModule,
     AsyncPipe,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-    FormsModule,
-    MatInputModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    ReactiveFormsModule,
+    CardNodeEmptyComponent,
+    CardNodeCreateComponent,
+    CardNodeComponent,
   ],
   templateUrl: './child-node.component.html',
   styleUrl: './child-node.component.scss',
@@ -61,8 +48,6 @@ export class ChildNodeComponent implements OnInit {
   locales$: Observable<Locale[]> = new Observable<Locale[]>();
 
   parentId: number = 0;
-
-  locales = new FormControl<Locale[]>([]);
 
   async ngOnInit() {
     this.locales$ = this.localesService.getLocales();
@@ -91,11 +76,11 @@ export class ChildNodeComponent implements OnInit {
     return await firstValueFrom(this.nodesService.getNode(id, locale));
   }
 
-  async changeLocale(event: MatSelectChange<Locale>, node: NodeTree) {
+  async changeLocale(locale: Locale, node: NodeTree) {
     const nodeTree = await lastValueFrom(this.nodes$);
 
     let getNodeTranslate = await firstValueFrom(
-      this.nodesService.getNode(node.id, event.value.locale)
+      this.nodesService.getNode(node.id, locale.locale)
     );
 
     if (getNodeTranslate.translation.length === 0) {
@@ -113,8 +98,8 @@ export class ChildNodeComponent implements OnInit {
     this.nodes$ = of(updatedNodes);
   }
 
-  async createNode() {
-    if (this.locales.value?.length! < 1) {
+  async createNode(locales: Locale[]) {
+    if (locales.length! < 1) {
       this.sweetalert2Service.showMessage(
         'Ocurrio algo',
         'Debe seleccionar al menos un lenguaje'
@@ -122,7 +107,8 @@ export class ChildNodeComponent implements OnInit {
       return;
     }
 
-    const selectedLocales = this.locales.value!.map((locale) => locale.locale);
+    const selectedLocales = locales.map((locale) => locale.locale);
+    const nodeTree = await lastValueFrom(this.nodes$);
 
     const nodeCreated = await firstValueFrom(
       this.nodesService.createNode({
@@ -130,14 +116,13 @@ export class ChildNodeComponent implements OnInit {
         parent: this.parentId,
       })
     );
-    const nodeTree = await lastValueFrom(this.nodes$);
 
     this.sweetalert2Service.showMessage(
       'Nodo creado',
       `Se acaba de crear el node con el id:${nodeCreated.id}`
     );
 
-    this.nodes$ = of([...nodeTree!]);
+    this.nodes$ = of([...nodeTree!, nodeCreated]);
   }
 
   async deleteNode(id: number) {

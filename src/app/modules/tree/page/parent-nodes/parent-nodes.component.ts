@@ -5,10 +5,11 @@ import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { Router } from '@angular/router';
+import { CardNodeParentComponent } from '../../components/card-node-parent/card-node-parent.component';
 
 @Component({
   selector: 'app-parents-node',
-  imports: [AsyncPipe, MatListModule, MatCardModule, MatChipsModule],
+  imports: [AsyncPipe, CardNodeParentComponent],
   templateUrl: './parent-nodes.component.html',
   styleUrl: './parent-nodes.component.scss',
 })
