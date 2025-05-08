@@ -3,7 +3,7 @@
   <app-card-node-empty (goBackEvent)="goBack()"></app-card-node-empty>
   } @else {
   <app-card-node-create
-    [locales]="(locales$ | async)!"
+    [locales]="locales"
     (selectedLocales)="createNode($event)"
   ></app-card-node-create>
 
@@ -11,7 +11,7 @@
   {
   <app-card-node
     [nodeInput]="node"
-    [localesInput]="(locales$ | async)!"
+    [localesInput]="locales"
     (currentId)="deleteNode($event)"
     (parentId)="goToParentNode($event)"
     (childId)="goToChildNode($event)"

@@ -17,7 +17,6 @@ import { Locale } from '../../../../core/models/locales.interface';
   imports: [
     MatCardModule,
     MatChipsModule,
-    AsyncPipe,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,

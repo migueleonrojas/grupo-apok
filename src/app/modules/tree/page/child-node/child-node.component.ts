@@ -45,12 +45,12 @@ export class ChildNodeComponent implements OnInit {
     NodeTree[] | undefined
   >();
 
-  locales$: Observable<Locale[]> = new Observable<Locale[]>();
+  locales: Locale[] = [];
 
   parentId: number = 0;
 
   async ngOnInit() {
-    this.locales$ = this.localesService.getLocales();
+    this.locales = await firstValueFrom(this.localesService.getLocales());
 
     this.route.paramMap.subscribe((params) => {
       this.parentId = Number(params.get('id'));
@@ -145,6 +145,11 @@ export class ChildNodeComponent implements OnInit {
       return;
     }
     let nodeDeleted = await firstValueFrom(this.nodesService.deleteNode(id));
+
+    if (childsCurrentNode === undefined) {
+      this.nodes$ = of(undefined);
+      return;
+    }
 
     const nodeTree = await lastValueFrom(this.nodes$);
 
